@@ -2,16 +2,24 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://trionn.com"),
-  title: "TRIONN | AI-Powered Creative Design & Development Studio",
-  description: "Websites, AI products, brands, and systems built for clarity, scale and impact.",
-  alternates: { canonical: "/" },
-  icons: { icon: "/sites/trionn/brand/blast-icon.svg" },
+  title: "Михаил Кудрицкий — Frontend-разработчик в Ташкенте | JustFront",
+  description: "Frontend-разработка сайтов и веб-приложений на React, Next.js, Vue и Nuxt. AI-интеграции и автоматизация бизнеса. Михаил Кудрицкий, преподаватель PROWEB, Ташкент и удалённо.",
+  keywords: [
+    "frontend-разработчик Ташкент",
+    "разработка сайтов Ташкент",
+    "React разработчик",
+    "Next.js разработчик",
+    "разработка веб-приложений",
+    "AI-интеграции для бизнеса",
+    "автоматизация бизнеса с ИИ",
+    "Михаил Кудрицкий frontend",
+  ],
+  icons: { icon: "/sites/mk-studio/brand/favicon.svg" },
   openGraph: {
-    title: "TRIONN | AI-Powered Creative Design & Development Studio",
-    description: "Independent digital studio crafting meaningful brand experiences through strategy, design, and technology.",
+    title: "Михаил Кудрицкий — Frontend-разработчик | JustFront",
+    description: "Разработка сайтов, веб-приложений и AI-интеграций в Ташкенте и удалённо. Преподаватель PROWEB.",
+    locale: "ru_RU",
     type: "website",
-    url: "https://trionn.com/",
   },
 };
 
@@ -21,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body>{children}</body>
     </html>
   );
