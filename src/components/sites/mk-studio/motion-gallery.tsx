@@ -81,7 +81,7 @@ export function MotionGallery({ projects }: { projects: Project[] }) {
           <Suspense fallback={null}><GalleryRibbon state={state} projects={projects} /></Suspense>
         </Canvas>
       </div>}
-      <div className="design-motion-bottom" ref={bottom}><p>Шесть проектов. Разные задачи и решения.</p><span>ЛИСТАЙТЕ ДАЛЬШЕ ↓</span></div>
+      <div className="design-motion-bottom" ref={bottom}><p>Сколько проектов, столько и решений.</p><span>ЛИСТАЙТЕ ДАЛЬШЕ ↓</span></div>
     </section>
     <ProjectDetails projects={projects} />
     </div>

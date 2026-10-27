@@ -586,3 +586,18 @@ html{scrollbar-gutter:stable}
 @media(max-width:380px){.menu-pill,.menu-is-open .menu-pill{width:80px;min-width:80px;flex-basis:80px;padding:0 8px}}
 @media(prefers-reduced-motion:reduce){.contact-layer,.contact-layer::before,.contact-layer .contact-panel{transition:none}}
 .menu-panel,.contact-panel{overscroll-behavior:contain}
+
+/* Keep primary touch controls comfortable without changing the desktop composition. */
+.site-header,.site-header.menu-is-open{z-index:1000;mix-blend-mode:normal;background:linear-gradient(180deg,rgba(5,12,13,.95),rgba(5,12,13,.76) 65%,transparent)}
+.menu-layer{z-index:990}
+.contact-layer{z-index:1010}
+.skip-link{z-index:1020}
+@media(max-width:767px){
+  .menu-pill[aria-expanded="false"] .menu-icon{display:none}
+  .talk-pill,.menu-pill{min-height:40px}
+  .hero-links .text-link{min-height:40px}
+  .hero-scroll{width:36px;height:36px}
+  .service-cta{min-height:44px;align-items:center}
+  .contact-panel>.contact-close-pill{min-height:40px}
+  .footer-cta a,.footer-discuss{min-height:40px;align-items:center}
+}

@@ -54,25 +54,26 @@ export function VisionScene() {
         const root = section.current;
         if (!root) return;
         const stripes = [...root.querySelectorAll<HTMLElement>(".vision-stripe")];
+        const sticky = root.querySelector<HTMLElement>(".vision-sticky");
+        const stickyTravel = () => Math.max(1, root.offsetHeight - (sticky?.offsetHeight ?? window.innerHeight));
         const update = (progress: number) => {
-          const compact = window.innerWidth < 480;
-          const travel = progress * 1.8;
           stripes.forEach((stripe, index) => {
-            const scale = compact && progress <= 0
-              ? 0
-              : Math.min(1, Math.max(0, travel + 0.45 - (4 - index) * 0.25));
+            const scale = Math.min(1, Math.max(0, progress * 2 - (4 - index) * 0.25));
             stripe.style.transform = `scaleY(${scale})`;
           });
         };
         const trigger = ScrollTrigger.create({
           trigger: root,
-          start: () => window.innerWidth < 480 ? "top -30%" : "top -38%",
-          end: () => window.innerWidth < 480 ? "top -145%" : "top -194%",
+          start: () => `top top-=${stickyTravel() * 0.3}`,
+          end: () => `top top-=${stickyTravel() * 0.9}`,
           onUpdate: ({ progress }) => update(progress),
           onRefresh: ({ progress }) => update(progress),
         });
         update(trigger.progress);
-        return () => trigger.kill();
+        return () => {
+          trigger.kill();
+          stripes.forEach((stripe) => stripe.style.removeProperty("transform"));
+        };
       }, section.current);
       cleanup = () => media.revert();
     })();

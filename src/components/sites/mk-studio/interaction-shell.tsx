@@ -253,7 +253,7 @@ export function SiteInteractionShell({ children }: { children: React.ReactNode }
             ref={menuToggleRef}
             type="button"
           >
-            <SplitHoverText key={menuOpen ? "close" : "menu"}>{menuOpen ? "ЗАКРЫТЬ" : "МЕНЮ"}</SplitHoverText><span aria-hidden="true">{menuOpen ? " ×" : " ㆔"}</span>
+            <SplitHoverText key={menuOpen ? "close" : "menu"}>{menuOpen ? "ЗАКРЫТЬ" : "МЕНЮ"}</SplitHoverText><span className="menu-icon" aria-hidden="true">{menuOpen ? " ×" : " ㆔"}</span>
           </button>
         </div>
       </header>

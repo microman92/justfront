@@ -68,7 +68,10 @@ export function KeyFacts() {
       if (disposed || !section.current || !track.current) return;
       gsap.registerPlugin(ScrollTrigger);
       const media = gsap.matchMedia();
-      media.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+      media.add({
+        desktop: "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+        mobile: "(max-width: 767px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)",
+      }, () => {
         const root = section.current!;
         const rail = track.current!;
         const travel = () => Math.max(0, rail.scrollWidth - window.innerWidth);

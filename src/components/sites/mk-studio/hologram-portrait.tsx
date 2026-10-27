@@ -44,6 +44,18 @@ const fragmentShader = `
     float ripple = sin(distanceToPointer * 40.0 - uTime * 2.5) * influence * 0.0008;
     uv -= drift + vec2(ripple, ripple * 0.3);
 
+    // Vary the location and direction of each brief signal disturbance.
+    float phase = mod(uTime, 4.5);
+    float cycle = floor(uTime / 4.5);
+    float direction = step(0.5, fract(sin((cycle + 1.0) * 78.233) * 43758.5453));
+    float position = 0.25 + 0.5 * fract(sin((cycle + 1.0) * 127.1) * 43758.5453);
+    float width = 0.035 + 0.035 * fract(sin((cycle + 1.0) * 311.7) * 43758.5453);
+    float pulse = smoothstep(1.8, 1.84, phase) * (1.0 - smoothstep(2.08, 2.14, phase)) * uMotion;
+    float axis = mix(uv.y, uv.x, direction);
+    float band = 1.0 - smoothstep(0.0, width, abs(axis - position));
+    float displacement = sin(floor(axis * 160.0) * 7.0 + uTime * 36.0) * band * pulse * 0.012;
+    uv += mix(vec2(displacement, 0.0), vec2(0.0, displacement), direction);
+
     // Quantize the portrait to the same screen lattice as the RGB subpixel mask.
     vec2 pixel = uv * uResolution;
     vec2 sampleUv = (floor(pixel / 3.5) + 0.5) * 3.5 / uResolution;
@@ -69,6 +81,7 @@ const fragmentShader = `
       + portraitAt(uv - vec2(0.0, glowOffset.y)).rgb;
     color += glow * vec3(0.045, 0.075, 0.065);
     color *= 1.0 + 0.018 * sin(uTime * 1.8 + pixel.y * 0.008) * uMotion;
+    color *= 1.0 + band * pulse * 0.15;
     float scan = exp(-pow((uv.y - fract(uTime * 0.065)) * 90.0, 2.0)) * 0.035 * uMotion;
     color += vec3(0.45, 0.85, 0.75) * scan;
     float bottomFade = smoothstep(0.0, 0.10, vUv.y);

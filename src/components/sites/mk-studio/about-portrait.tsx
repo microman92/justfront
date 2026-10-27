@@ -6,6 +6,10 @@ export function AboutPortrait() {
   return <section className={styles.section} id="about" aria-labelledby="about-title" itemScope itemType="https://schema.org/Person">
     <div className={styles.layout}>
       <div className={styles.topline}><span>ОБО МНЕ / JUSTFRONT</span><span>ТАШКЕНТ · РАБОТАЮ УДАЛЁННО</span></div>
+      <figure className={styles.portrait}>
+        <HologramPortrait />
+        <figcaption><span>FRONTEND / AI</span></figcaption>
+      </figure>
       <div className={styles.copy}>
         <p className={styles.eyebrow} itemProp="jobTitle">ВЕБ-РАЗРАБОТЧИК И ПРЕПОДАВАТЕЛЬ</p>
         <h2 id="about-title">Веб-разработчик<br /><span>для вашего бизнеса.</span></h2>
@@ -21,10 +25,6 @@ export function AboutPortrait() {
           <a href="https://t.me/justfront" target="_blank" rel="noopener noreferrer">НАПИСАТЬ В TELEGRAM <span aria-hidden="true">↗</span></a>
         </div>
       </div>
-      <figure className={styles.portrait}>
-        <HologramPortrait />
-        <figcaption><span>FRONTEND / AI</span></figcaption>
-      </figure>
     </div>
   </section>;
 }

@@ -243,8 +243,7 @@ export function ServiceSequence() {
       const cardProgress = clamp((progress - 0.56) / 0.44);
       const cardPhase = cardProgress * Math.max(1, mobileCards.length - 1);
       desktopCards.forEach((label, index) => {
-        const travel = 0.45 + Math.max(0, desktopCards.length - 1) * 0.2;
-        const phase = clamp((cardProgress * travel - index * 0.2) / 0.45);
+        const phase = clamp(cardProgress * desktopCards.length - index);
         const width = Math.round(window.innerWidth * (window.innerWidth < 1512 ? 0.42 : 0.32));
         const height = Math.max(300, Math.min(430, Math.round(window.innerHeight * 0.36)));
         const inset = window.innerWidth < 1512 ? 40 : window.innerWidth * 0.1;
@@ -258,12 +257,14 @@ export function ServiceSequence() {
         label.style.setProperty("--service-x", String(startX + bend * (endX - startX)) + "px");
         label.style.setProperty("--service-y", String(y) + "px");
         label.classList.toggle("is-active", opacity > 0.5);
+        label.inert = opacity <= 0.5;
       });
       mobileCards.forEach((label, index) => {
-        const phase = clamp(progress * 4 - index);
+        const distance = Math.abs(index - cardPhase);
         label.style.setProperty("--service-offset", String(index - cardPhase));
         label.style.setProperty("--service-opacity", String(clamp(1 - Math.abs(index - cardPhase) * 1.15) * clamp((progress - 0.56) * 15)));
-        label.classList.toggle("is-active", phase > 0.5);
+        label.classList.toggle("is-active", distance < 0.5 && progress > 0.56);
+        label.inert = distance >= 0.5 || progress <= 0.56;
       });
       section.style.setProperty("--service-progress", String(progress));
     };
@@ -296,6 +297,8 @@ export function ServiceSequence() {
         tracking = false;
       }
       if (reducedMotion.matches) {
+        window.cancelAnimationFrame(motionFrame);
+        motionFrame = 0;
         scrollProgress.current = 0;
         section.style.setProperty("--service-progress", "0.5");
         section.style.setProperty("--network-opacity", "1");
@@ -304,6 +307,7 @@ export function ServiceSequence() {
         section.querySelectorAll<HTMLElement>(".service-row").forEach((label) => {
           label.style.removeProperty("--service-offset");
           label.style.removeProperty("--service-opacity");
+          label.inert = false;
         });
         return;
       }
@@ -322,6 +326,7 @@ export function ServiceSequence() {
       window.removeEventListener("resize", measureProgress);
       reducedMotion.removeEventListener("change", configureMotion);
       window.cancelAnimationFrame(motionFrame);
+      [...desktopCards, ...mobileCards].forEach((label) => { label.inert = false; });
     };
   }, []);
 

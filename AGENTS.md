@@ -8,63 +8,22 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Website Reverse-Engineer Template
+# JustFront
 
-## What This Is
-A reusable template for reverse-engineering any website into a clean, modern Next.js codebase using AI coding agents. The Next.js + shadcn/ui + Tailwind v4 base is pre-scaffolded — just run `/clone-website <url1> [<url2> ...]`.
+Персональное портфолио Михаила Кудрицкого на Next.js 16, React 19 и TypeScript. Анимации и сцены используют GSAP, Three.js, React Three Fiber и Lenis.
 
-## Tech Stack
-- **Framework:** Next.js 16 (App Router, React 19, TypeScript strict)
-- **UI:** shadcn/ui (Base UI primitives, Tailwind CSS v4, `cn()` utility)
-- **Icons:** Lucide React (default — will be replaced/supplemented by extracted SVGs)
-- **Styling:** Tailwind CSS v4 with oklch design tokens
-- **Deployment:** Vercel
+## Команды
 
-## Commands
-- `npm run dev` — Start dev server
-- `npm run build` — Production build
-- `npm run lint` — ESLint check
-- `npm run typecheck` — TypeScript check
-- `npm run check` — Run lint + typecheck + build
+- `npm run dev` — сервер разработки
+- `npm run build` — production-сборка
+- `npm run lint` — ESLint
+- `npm run typecheck` — проверка TypeScript
+- `npm run check` — lint, проверка типов и сборка
 
-## Code Style
-- TypeScript strict mode, no `any`
-- Named exports, PascalCase components, camelCase utils
-- Tailwind utilities or scoped CSS; avoid inline styles unless behavior needs dynamic values
-- 2-space indentation
-- Responsive: mobile-first
+## Работа с проектом
 
-## Design Principles
-- **Pixel-perfect emulation** — match the target's spacing, colors, typography exactly
-- **No personal aesthetic changes during emulation phase** — match 1:1 first, customize later
-- **Real content** — use actual text and assets from the target site, not placeholders
-- **Beauty-first** — every pixel matters
-
-## Project Structure
-```
-src/
-  app/              # Next.js routes
-  components/       # React components
-    ui/             # shadcn/ui primitives
-    sites/<site>/   # Source-specific components, including extracted SVGs
-  lib/
-    utils.ts        # cn() utility (shadcn)
-  types/            # TypeScript interfaces
-  hooks/            # Custom React hooks
-public/
-  sites/<site>/     # Source-specific images, fonts, video, and other assets
-docs/
-  research/<site>/  # Page brief, asset map, and inspection evidence
-  design-references/ # Screenshots and visual references
-scripts/            # Asset download scripts
-.agents/
-  skills/
-    clone-website/  # Canonical cross-agent cloning workflow
-.claude/
-  commands/
-    clone-website.md # Thin Claude Code invocation bridge
-```
-
-## Agent Workflow
-- Edit `.agents/skills/clone-website/` for cloning-workflow changes. It is the canonical skill used by Codex, Cursor, and OpenCode.
-- Keep `.claude/commands/clone-website.md` as a thin Claude Code bridge to the canonical skill; do not duplicate the workflow there.
+- Сохраняйте существующую механику анимаций и совместимость со сниженной анимацией.
+- Используйте TypeScript strict, именованные экспорты и стили, принятые в проекте.
+- Проверяйте адаптацию для мобильных экранов и очищайте подписки и анимации при размонтировании.
+- Не помещайте токены и другие секреты в клиентский код или Git.
+- Сайт, компоненты и ресурсы находятся в `src/` и `public/sites/mk-studio/`; настройка заявок описана в `docs/telegram-contact.md`.

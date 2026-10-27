@@ -19,14 +19,18 @@ export function ProjectDetails({ projects }: { projects: Project[] }) {
       if (cancelled || !section.current || !stage.current) return;
       const context = gsap.context(() => {
         const media = gsap.matchMedia();
-        media.add("(min-width: 768px) and (min-height: 650px) and (prefers-reduced-motion: no-preference)", () => {
+        media.add({
+          desktop: "(min-width: 768px) and (min-height: 650px) and (prefers-reduced-motion: no-preference)",
+          mobile: "(max-width: 767px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)",
+        }, (context) => {
+          const mobile = Boolean(context.conditions?.mobile);
           const root = section.current!;
           const viewport = stage.current!;
           const cards = Array.from(viewport.querySelectorAll<HTMLElement>("[data-project-card]"));
           root.classList.add(styles.animated);
-          const origin = () => `50% 50% -${viewport.clientHeight / 2}px`;
-          gsap.set(cards, { rotationX: -90, autoAlpha: 0, transformOrigin: origin });
-          gsap.set(cards[0], { rotationX: 0, autoAlpha: 1 });
+          const origin = () => `50% 50% -${(mobile ? Math.min(viewport.clientWidth, viewport.clientHeight) : viewport.clientHeight) / 2}px`;
+          gsap.set(cards, { rotationX: 0, rotationY: 0, autoAlpha: 0, transformOrigin: origin });
+          gsap.set(cards[0], { autoAlpha: 1 });
           let activeIndex = -1;
           const timeline = gsap.timeline({
             paused: true,
@@ -44,9 +48,16 @@ export function ProjectDetails({ projects }: { projects: Project[] }) {
           cards.forEach((card, index) => {
             if (!index) return;
             const start = index * 1.5 - 0.9;
-            timeline.set(card, { autoAlpha: 1 }, start);
-            timeline.to(cards[index - 1], { rotationX: 90, duration: 0.9, ease: "none" }, start);
-            timeline.fromTo(card, { rotationX: -90 }, { rotationX: 0, duration: 0.9, ease: "none", immediateRender: false }, start);
+            const turns = [
+              { axis: "rotationY", angle: -90 },
+              { axis: "rotationX", angle: 90 },
+              { axis: "rotationY", angle: 90 },
+              { axis: "rotationX", angle: -90 },
+            ] as const;
+            const { axis, angle } = mobile ? turns[(index - 1) % turns.length] : { axis: "rotationX", angle: 90 };
+            timeline.set(card, { rotationX: 0, rotationY: 0, autoAlpha: 1 }, start);
+            timeline.to(cards[index - 1], { [axis]: angle, duration: 0.9, ease: "none" }, start);
+            timeline.fromTo(card, { [axis]: -angle }, { [axis]: 0, duration: 0.9, ease: "none", immediateRender: false }, start);
             timeline.set(cards[index - 1], { autoAlpha: 0 }, start + 0.9);
           });
           let frame = 0;

@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "./content";
-import { reviewSlots } from "./review-slots";
+import { reviewSlots, type ReviewSlot } from "./review-slots";
 import { ReviewCard } from "./review-card";
+import { ReviewDialog } from "./review-dialog";
 import reviewStyles from "./reviews.module.css";
 import { ServiceSequence } from "./service-sequence";
+
+const siteReviews = reviewSlots.filter((review) => review.side === "site");
+const teachingReviews = reviewSlots.filter((review) => review.side === "teaching");
+const orderedReviews = Array.from({ length: Math.max(siteReviews.length, teachingReviews.length) }, (_, index) => [siteReviews[index], teachingReviews[index]])
+  .flat().filter((review): review is ReviewSlot => Boolean(review));
 
 function useScrollTrigger(setup: (gsap: typeof import("gsap").gsap, trigger: typeof import("gsap/ScrollTrigger").ScrollTrigger) => void) {
   const scope = useRef<HTMLDivElement>(null);
@@ -116,6 +122,7 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
 
 export function ReviewsScene() {
   const scope = useRef<HTMLElement>(null);
+  const [selectedReview, setSelectedReview] = useState<ReviewSlot | null>(null);
 
   return (
     <section aria-labelledby="reviews-title" className={`services-section ${reviewStyles.scene}`} id="reviews" ref={scope}>
@@ -131,13 +138,13 @@ export function ReviewsScene() {
         </div>
         <ServiceSequence />
         <ol className="service-list service-desktop-list" aria-label="Отзывы о работе и преподавании">
-          {reviewSlots.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={review.id}>
-            <ReviewCard review={review} index={index} />
+          {orderedReviews.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} data-review-side={review.side} key={review.id}>
+            <ReviewCard review={review} index={index} onOpen={setSelectedReview} />
           </li>)}
         </ol>
         <ol className="service-list service-mobile-list" aria-label="Отзывы о работе и преподавании">
-          {reviewSlots.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={review.id}>
-            <ReviewCard review={review} index={index} />
+          {orderedReviews.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} data-review-side={review.side} key={review.id}>
+            <ReviewCard review={review} index={index} onOpen={setSelectedReview} />
           </li>)}
         </ol>
         <p className="service-caption service-caption-intent"><span aria-hidden="true">✦</span> О РАБОТЕ И ОБУЧЕНИИ СО МНОЙ.</p>
@@ -147,6 +154,7 @@ export function ReviewsScene() {
           {Array.from({ length: 5 }, (_, index) => <div className="service-exit-stripe" key={index} />)}
         </div>
       </div>
+      {selectedReview && <ReviewDialog review={selectedReview} onClose={() => setSelectedReview(null)} />}
     </section>
   );
 }
