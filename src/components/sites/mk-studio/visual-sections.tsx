@@ -39,12 +39,12 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
     const cards = Array.from(section.querySelectorAll<HTMLElement>(".project-card"));
     const reveals = cards.map((card) => {
       const title = card.querySelector<HTMLElement>(".project-caption h3");
-      const description = card.querySelector<HTMLElement>(".project-description");
+      const story = card.querySelector<HTMLElement>(".project-story");
       const link = card.querySelector<HTMLElement>(".project-caption a");
-      gsap.set([title, description, link], { autoAlpha: 0 });
+      gsap.set([title, story, link], { autoAlpha: 0 });
       return gsap.timeline({ paused: true })
         .to(title, { autoAlpha: 1, duration: 0.7, ease: "sine.out" })
-        .to(description, { autoAlpha: 1, duration: 0.6, ease: "sine.out" }, "<")
+        .to(story, { autoAlpha: 1, duration: 0.6, ease: "sine.out" }, "<")
         .to(link, { autoAlpha: 1, duration: 0.4, ease: "sine.out" }, "<50%");
     });
     const revealVisibleCards = () => cards.forEach((card, index) => {
@@ -88,7 +88,7 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
           <article className={`project-card project-card-${index + 1}`} key={project.name}>
             <a aria-label={`Открыть сайт ${project.name}`} className="project-image" href={project.href} rel="noopener noreferrer" target="_blank">
               <div aria-hidden="true" className="project-cover">
-                <span className="project-cover-index">0{index + 1} / JUSTFRONT</span>
+                <span className="project-cover-index">0{index + 1} / КЕЙС</span>
                 <strong className="project-cover-name">{project.name}</strong>
                 <span className="project-cover-category">{project.category}</span>
                 <span className="project-cover-focus">{project.focus}</span>
@@ -96,12 +96,17 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
               <span className="project-image-arrow" aria-hidden="true">↗</span>
             </a>
             <div className="project-caption">
-              <div><p className="project-meta">{project.category}</p><h3>{project.name}</h3><p className="project-description">{project.description}</p></div>
-              <a className="underlined-link" href={project.href} rel="noopener noreferrer" target="_blank">ОТКРЫТЬ САЙТ <span aria-hidden="true">↗</span></a>
+              <h3>{project.name}</h3>
+              <div className="project-story">
+                <p><span>ЗАДАЧА</span>{project.task}</p>
+                <p><span>РЕШЕНИЕ</span>{project.solution}</p>
+                <p><span>ИТОГ</span>{project.outcome}</p>
+              </div>
+              <a className="underlined-link" href={project.href} rel="noopener noreferrer" target="_blank">ОТКРЫТЬ ПРОЕКТ <span aria-hidden="true">↗</span></a>
             </div>
           </article>
         ))}
-      <div className="work-closer"><p>Ссылки ведут на опубликованные проекты. В каждом описании указал свою часть работы и технологии.</p><a className="underlined-link" href="#contact">ОБСУДИТЬ ВАШ ПРОЕКТ <span aria-hidden="true">→</span></a></div>
+      <div className="work-closer"><p>От задачи до работающего интерфейса. Посмотрите проекты вживую.</p><a className="underlined-link" href="#contact">ОБСУДИТЬ ВАШ ПРОЕКТ <span aria-hidden="true">→</span></a></div>
       </div>
     </section>
   );
@@ -109,12 +114,6 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
 
 export function ServiceScene() {
   const scope = useRef<HTMLElement>(null);
-  const descriptions = [
-    "Корпоративные и сервисные сайты с адаптивной вёрсткой, SEO и нужными интеграциями.",
-    "Веб-интерфейсы, кабинеты и внутренние инструменты на React, Next.js, Vue и Nuxt.",
-    "Подключаю AI-инструменты и автоматизирую повторяющиеся процессы бизнеса.",
-  ];
-  const desktopCardOrder = [0, 1, 2];
 
   return (
     <section aria-labelledby="services-title" className="services-section" id="service-scene" ref={scope}>
@@ -130,14 +129,29 @@ export function ServiceScene() {
         </div>
         <ServiceSequence />
         <ol className="service-list service-desktop-list">
-          {desktopCardOrder.map((originalIndex, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={services[originalIndex]}>
-            <h3>{services[originalIndex]}</h3>
-            <span aria-hidden="true" className="service-card-symbol">0{originalIndex + 1}</span>
-            <p>{descriptions[originalIndex]}</p>
-          </li>)}
+          {services.map((service, index) => {
+            return <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={service.title}>
+              <span className="service-card-symbol">{service.kicker}</span>
+              <div className={`service-diagram service-diagram-${service.visual}`} aria-hidden="true">
+                {service.visual === "website" && <><span className="diagram-browser-bar"><i /><i /><i /></span><span className="diagram-browser-hero" /><span className="diagram-browser-line" /><span className="diagram-browser-line short" /><span className="diagram-browser-action" /></>}
+                {service.visual === "application" && <><span className="diagram-dashboard-side" /><span className="diagram-dashboard-cell" /><span className="diagram-dashboard-cell" /><span className="diagram-dashboard-cell wide" /><span className="diagram-dashboard-chart" /></>}
+                {service.visual === "automation" && <><span className="diagram-node node-one" /><span className="diagram-node node-two" /><span className="diagram-node node-three" /><span className="diagram-node node-four" /><span className="diagram-node node-five" /><span className="diagram-link link-one" /><span className="diagram-link link-two" /><span className="diagram-link link-three" /><span className="diagram-link link-four" /></>}
+              </div>
+              <div className="service-copy">
+                <h3>{service.title}</h3>
+                <p className="service-explanation">{service.explanation}</p>
+                <p className="service-benefit">{service.benefit}</p>
+                <span className="service-includes">{service.includes}</span>
+              </div>
+            </li>;
+          })}
         </ol>
         <ol className="service-list service-mobile-list">
-          {services.map((service, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={service}>{service}</li>)}
+          {services.map((service, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={service.title}>
+            <span className="service-card-symbol">0{index + 1} / {service.kicker}</span>
+            <h3>{service.title}</h3>
+            <p>{service.benefit}</p>
+          </li>)}
         </ol>
         <p className="service-caption service-caption-intent"><span aria-hidden="true">✦</span> ЯСНЫЕ ЗАДАЧИ. ВНИМАНИЕ К ДЕТАЛЯМ.</p>
         <p className="service-caption"><span aria-hidden="true">✦</span> САЙТЫ / ВЕБ-ПРИЛОЖЕНИЯ / AI-АВТОМАТИЗАЦИЯ.</p>

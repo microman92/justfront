@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-const statement = "Разрабатываю сайты и веб-приложения, интегрирую AI в рабочие процессы бизнеса.";
+const statement = "Объясняю сложные технологии и применяю их в реальных проектах.";
 
 export function AboutScene() {
   const section = useRef<HTMLElement>(null);
@@ -24,8 +24,8 @@ export function AboutScene() {
     return () => { cancelled = true; cleanup?.(); };
   }, []);
   return <section aria-labelledby="about-title" className="about-section" id="about" ref={section}>
-    <div className="about-head"><p className="eyebrow">МИХАИЛ КУДРИЦКИЙ · FRONTEND И AI</p><h2 id="about-title" aria-label={statement}><span aria-hidden="true">{statement.split(" ").map((word, index) => <span className="about-word" key={index}>{word}{" "}</span>)}</span></h2></div>
-    <div className="about-bottom"><p className="about-principle">PROWEB.<br />FRONTEND → AI.<br />300+ УЧЕНИКОВ.</p><div className="about-aside"><p>Преподаватель PROWEB с 2021 года. Преподавал Frontend, сейчас веду AI-направления. Коммерчески разрабатываю сайты и приложения с 2023 года.</p><a className="underlined-link" href="#contact">ОБСУДИТЬ ЗАДАЧУ <span aria-hidden="true">→</span></a></div></div>
+    <div className="about-head"><p className="eyebrow">МИХАИЛ КУДРИЦКИЙ · ПРЕПОДАВАТЕЛЬ PROWEB</p><h2 id="about-title" aria-label={statement}><span aria-hidden="true">{statement.split(" ").map((word, index) => <span className="about-word" key={index}>{word}{" "}</span>)}</span></h2></div>
+    <div className="about-bottom"><p className="about-principle">PROWEB · С 2021.<br />FRONTEND → AI.<br />ТАШКЕНТ · УДАЛЁННО.</p><div className="about-aside"><p>Преподаю в PROWEB с 2021 года: начинал с Frontend, сейчас веду AI-направления. Опыт преподавания помогает объяснять технические решения простым языком — и в аудитории, и в работе над продуктом.</p><a className="underlined-link" href="#contact">ОБСУДИТЬ ЗАДАЧУ <span aria-hidden="true">→</span></a></div></div>
   </section>;
 }
 
@@ -80,7 +80,7 @@ export function VisionScene() {
   }, []);
   return <section aria-label="Мой подход" className="vision-section" id="vision" ref={section}><div className="vision-sticky">
     <p className="vision-copy">ЯСНАЯ ЗАДАЧА.<br />ТОЧНАЯ РЕАЛИЗАЦИЯ.</p>
-    <div aria-hidden="true" className="vision-marquee"><div className="vision-marquee-track">{Array.from({ length: 3 }, (_, index) => <span key={index}>ПРОЕКТИРУЮ <i>+</i> СОЗДАЮ <i>+</i> АВТОМАТИЗИРУЮ <i>+</i></span>)}</div></div>
+    <div aria-hidden="true" className="vision-marquee"><div className="vision-marquee-track">{Array.from({ length: 3 }, (_, index) => <span key={index}>ПРОЕКТИРУЮ <i>+</i> СОЗДАЮ <i>+</i> АВТОМАТИЗИРУЮ <i>+</i> ПРЕПОДАЮ <i>+</i></span>)}</div></div>
     <p className="vision-caption">✦ ОТ ИДЕИ ДО РАБОЧЕГО ИНТЕРФЕЙСА.</p>
     <div aria-hidden="true" className="vision-stripes">{Array.from({ length: 5 }, (_, index) => <div className="vision-stripe" key={index} />)}</div>
   </div></section>;

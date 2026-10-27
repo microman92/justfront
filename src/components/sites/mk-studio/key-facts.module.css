@@ -1,0 +1,51 @@
+.section { position:relative; z-index:2; color:#e0e9e7; }
+.anchor { position:absolute; top:0; scroll-margin-top:0; }
+.sticky { position:relative; overflow:hidden; background:linear-gradient(180deg,#07101130,#07101175 45%,#07101145); }
+.track { display:flex; align-items:center; gap:7vw; width:max-content; padding:110px 6vw 70px; }
+.heading { width:43vw; flex:none; padding-right:5vw; }
+.eyebrow,.formats,.scrollHint,.contact,.details p>span,.step { font:400 10px/1.5 var(--mono); letter-spacing:.04em; }
+.eyebrow { margin:0; color:#a1d2c8; }
+.heading h2 { margin:26px 0; font:400 clamp(48px,5.4vw,88px)/.98 var(--display); letter-spacing:-.055em; }
+.heading h2 span { color:#9cd0c7; }
+.introduction { max-width:32ch; margin:0; color:#c0ceca; font-size:15px; line-height:1.6; }
+.scrollHint { display:flex; gap:30px; margin:44px 0 0; color:#c8d9d4; }
+.card { width:60vw; max-width:1050px; flex:none; }
+.cover { position:relative; display:flex; flex-direction:column; justify-content:space-between; min-height:350px; height:46svh; padding:28px 32px; border:1px solid #83b8ae38; background:linear-gradient(125deg,#0c191be6,#071011b8); overflow:hidden; }
+.cover::before { content:""; position:absolute; inset:0; background:linear-gradient(135deg,transparent 49.85%,#7dbdb31c 50%,transparent 50.15%); pointer-events:none; }
+.cover h3 { position:relative; max-width:16ch; margin:22px 0; font:400 clamp(35px,4.7vw,76px)/1 var(--display); letter-spacing:-.055em; }
+.formats { position:relative; margin:18px 0 0; color:#aec8c1; font-size:11px; }
+.flow { position:relative; display:flex; width:min(100%,430px); justify-content:space-between; margin-top:auto; }
+.flow::before { content:""; position:absolute; height:1px; left:28px; right:28px; top:22px; background:#7cb9ad60; }
+.step { position:relative; display:grid; justify-items:center; gap:9px; color:#c0d5cf; font-size:10px; }
+.node { display:grid; place-items:center; width:45px; height:45px; border:1px solid #83bfb18c; border-radius:50%; background:#102222; color:#bee2d8; }
+.caption { padding:18px 0 0; background:linear-gradient(180deg,#071011cf,#071011a6); }
+.captionHead { display:flex; align-items:center; justify-content:space-between; gap:22px; padding-bottom:14px; border-bottom:1px solid #81b3a743; }
+.caption h4 { margin:0; font:400 clamp(22px,2.1vw,33px)/1.1 var(--display); letter-spacing:-.04em; }
+.contact { display:flex; align-items:center; gap:20px; flex:none; padding:9px 0; color:#dce9e5; border:0; border-bottom:1px solid #a1c8bc; background:transparent; cursor:pointer; font-size:10px; }
+.contact:hover { color:#a9ded0; }
+.contact:focus-visible { outline:2px solid #b8e5d9; outline-offset:5px; }
+.details { display:grid; grid-template-columns:1.5fr 1fr; gap:36px; padding-top:16px; }
+.details p { margin:0; color:#c5d2ce; font-size:15px; line-height:1.55; }
+.details p>span { display:block; margin-bottom:9px; color:#9bcbbf; font-size:10px; }
+@media(min-width:768px) and (prefers-reduced-motion:no-preference) {
+ .section { height:570svh; }
+ .sticky { position:sticky; top:0; height:100svh; }
+ .track { height:100%; padding-block:90px 35px; }
+}
+@media(min-width:768px) and (max-height:740px) { .cover { min-height:260px; height:42svh; padding:20px 26px; } .cover h3 { font-size:clamp(32px,4vw,65px); margin:14px 0; } .details p { font-size:12px; } .heading h2 { font-size:clamp(45px,5vw,78px); } }
+@media(max-width:767px), (prefers-reduced-motion:reduce) {
+ .track { display:grid; width:auto; gap:44px; padding:90px 22px 50px; }
+ .heading,.card { width:100%; max-width:none; }
+ .heading { padding:0 0 10px; }
+ .heading h2 { font-size:clamp(45px,9vw,70px); }
+ .heading h2 br:last-of-type { display:none; }
+ .scrollHint { display:none; }
+ .cover { height:auto; min-height:340px; padding:24px; }
+ .cover h3 { font-size:clamp(35px,8vw,58px); margin:32px 0; }
+ .captionHead { align-items:start; flex-direction:column; gap:12px; }
+ .caption h4 { font-size:27px; }
+ .details { gap:20px; grid-template-columns:1fr; }
+ .details p { font-size:15px; }
+ .details p>span { font-size:10px; }
+ .formats { font-size:11px; }
+}

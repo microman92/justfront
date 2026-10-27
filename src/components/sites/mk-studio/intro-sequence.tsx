@@ -24,8 +24,13 @@ export function IntroSequence({ children }: { children: React.ReactNode }) {
     const updateMotion = () => setReducedMotion(media.matches);
     let sequenceTop = 0;
     let sequenceHeight = window.innerHeight * 3.2;
+    let servicesTop = 0;
+    let servicesTravel = 0;
     const updateScroll = () => {
-      scrollPosition.current = Math.max(0, (window.scrollY - sequenceTop) / window.innerHeight);
+      const offset = Math.max(0, window.scrollY - sequenceTop);
+      // Keep the opening scene's progression while the services rail travels sideways.
+      const railOffset = Math.min(servicesTravel, Math.max(0, offset - servicesTop));
+      scrollPosition.current = (offset - railOffset * .82) / window.innerHeight;
       if (canvasAnchor.current) {
         // The source mark fades through the opening service overview and approach scene.
         const sequenceLength = sequenceHeight / window.innerHeight;
@@ -39,6 +44,9 @@ export function IntroSequence({ children }: { children: React.ReactNode }) {
       if (wrapper.current) {
         sequenceTop = window.scrollY + wrapper.current.getBoundingClientRect().top;
         sequenceHeight = wrapper.current.offsetHeight;
+        const services = wrapper.current.querySelector<HTMLElement>("#services");
+        servicesTop = services?.offsetTop ?? 0;
+        servicesTravel = services ? Math.max(0, services.offsetHeight - window.innerHeight) : 0;
       }
       updateScroll();
     };
