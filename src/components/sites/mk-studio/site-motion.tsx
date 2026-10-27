@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { registerSmoothScroll } from "./smooth-scroll";
 
 export function SiteMotion({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -18,12 +19,14 @@ export function SiteMotion({ children }: { children: React.ReactNode }) {
       if (disposed) return;
       gsap.registerPlugin(ScrollTrigger);
       const lenis = new Lenis({ autoRaf: false, smoothWheel: true, syncTouch: false });
+      const unregisterSmoothScroll = registerSmoothScroll(lenis);
       const tick = (time: number) => lenis.raf(time * 1000);
       const onScroll = () => ScrollTrigger.update();
       lenis.on("scroll", onScroll);
       gsap.ticker.add(tick);
       gsap.ticker.lagSmoothing(0);
       cleanup = () => {
+        unregisterSmoothScroll();
         gsap.ticker.remove(tick);
         lenis.off("scroll", onScroll);
         lenis.destroy();
