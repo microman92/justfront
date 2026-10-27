@@ -1,0 +1,14 @@
+.line { display:flex; align-items:baseline; gap:13px; max-width:100%; }
+.prefix { flex:none; color:#b9c8c6; }
+.words { display:inline-grid; min-width:0; color:#a5dbce; }
+.word { grid-area:1/1; display:flex; align-items:start; visibility:hidden; white-space:nowrap; }
+.word:first-child { visibility:visible; }
+.cell { display:inline-block; height:1.25em; overflow:hidden; vertical-align:top; }
+.glyph { display:inline-block; height:1.25em; line-height:1.25; }
+.static { display:none; }
+@media(max-width:767px) { .line { gap:9px; } }
+@media(prefers-reduced-motion:reduce) {
+  .line { flex-wrap:wrap; row-gap:5px; }
+  .words { display:none; }
+  .static { display:inline; color:#a5dbce; font-size:.85em; line-height:1.4; }
+}

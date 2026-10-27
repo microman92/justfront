@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import type { Project } from "./content";
-import { services } from "./content";
+import { reviewSlots } from "./review-slots";
+import { ReviewCard } from "./review-card";
+import reviewStyles from "./reviews.module.css";
 import { ServiceSequence } from "./service-sequence";
 
 function useScrollTrigger(setup: (gsap: typeof import("gsap").gsap, trigger: typeof import("gsap/ScrollTrigger").ScrollTrigger) => void) {
@@ -82,7 +84,7 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
       <div className="project-track">
       <div className="work-heading">
         <h2 id="work-title">Реальные проекты</h2>
-        <a className="underlined-link" href="#service-scene">СМОТРЕТЬ УСЛУГИ <span aria-hidden="true">↓</span></a>
+        <a className="underlined-link" href="#reviews">СМОТРЕТЬ УСЛУГИ <span aria-hidden="true">↓</span></a>
       </div>
         {items.map((project, index) => (
           <article className={`project-card project-card-${index + 1}`} key={project.name}>
@@ -112,49 +114,34 @@ export function ProjectRail({ projects: items }: { projects: Project[] }) {
   );
 }
 
-export function ServiceScene() {
+export function ReviewsScene() {
   const scope = useRef<HTMLElement>(null);
 
   return (
-    <section aria-labelledby="services-title" className="services-section" id="service-scene" ref={scope}>
+    <section aria-labelledby="reviews-title" className={`services-section ${reviewStyles.scene}`} id="reviews" ref={scope}>
       <div className="service-sticky">
         <div aria-hidden="true" className="service-backdrop">
           <span className="service-smoke service-smoke-one" />
           <span className="service-smoke service-smoke-two" />
           <span className="service-smoke service-smoke-three" />
         </div>
-        <h2 className="service-heading" id="services-title">УСЛУГИ</h2>
+        <h2 className="service-heading" id="reviews-title">ОТЗЫВЫ</h2>
         <div aria-hidden="true" className="service-intro-words">
-          {["САЙТЫ", "ВЕБ", "AI"].map((word) => <div className="service-intro-word" key={word}>{[...word].map((letter, index) => <span className="service-intro-letter" key={word + index}>{letter}</span>)}</div>)}
+          {["РАБОТА", "И", "ОБУЧЕНИЕ"].map((word) => <div className="service-intro-word" key={word}>{[...word].map((letter, index) => <span className="service-intro-letter" key={word + index}>{letter}</span>)}</div>)}
         </div>
         <ServiceSequence />
-        <ol className="service-list service-desktop-list">
-          {services.map((service, index) => {
-            return <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={service.title}>
-              <span className="service-card-symbol">{service.kicker}</span>
-              <div className={`service-diagram service-diagram-${service.visual}`} aria-hidden="true">
-                {service.visual === "website" && <><span className="diagram-browser-bar"><i /><i /><i /></span><span className="diagram-browser-hero" /><span className="diagram-browser-line" /><span className="diagram-browser-line short" /><span className="diagram-browser-action" /></>}
-                {service.visual === "application" && <><span className="diagram-dashboard-side" /><span className="diagram-dashboard-cell" /><span className="diagram-dashboard-cell" /><span className="diagram-dashboard-cell wide" /><span className="diagram-dashboard-chart" /></>}
-                {service.visual === "automation" && <><span className="diagram-node node-one" /><span className="diagram-node node-two" /><span className="diagram-node node-three" /><span className="diagram-node node-four" /><span className="diagram-node node-five" /><span className="diagram-link link-one" /><span className="diagram-link link-two" /><span className="diagram-link link-three" /><span className="diagram-link link-four" /></>}
-              </div>
-              <div className="service-copy">
-                <h3>{service.title}</h3>
-                <p className="service-explanation">{service.explanation}</p>
-                <p className="service-benefit">{service.benefit}</p>
-                <span className="service-includes">{service.includes}</span>
-              </div>
-            </li>;
-          })}
-        </ol>
-        <ol className="service-list service-mobile-list">
-          {services.map((service, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={service.title}>
-            <span className="service-card-symbol">0{index + 1} / {service.kicker}</span>
-            <h3>{service.title}</h3>
-            <p>{service.benefit}</p>
+        <ol className="service-list service-desktop-list" aria-label="Отзывы о работе и преподавании">
+          {reviewSlots.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={review.id}>
+            <ReviewCard review={review} index={index} />
           </li>)}
         </ol>
-        <p className="service-caption service-caption-intent"><span aria-hidden="true">✦</span> ЯСНЫЕ ЗАДАЧИ. ВНИМАНИЕ К ДЕТАЛЯМ.</p>
-        <p className="service-caption"><span aria-hidden="true">✦</span> САЙТЫ / ВЕБ-ПРИЛОЖЕНИЯ / AI-АВТОМАТИЗАЦИЯ.</p>
+        <ol className="service-list service-mobile-list" aria-label="Отзывы о работе и преподавании">
+          {reviewSlots.map((review, index) => <li className={`service-row service-row-${index + 1}${index === 0 ? " is-active" : ""}`} key={review.id}>
+            <ReviewCard review={review} index={index} />
+          </li>)}
+        </ol>
+        <p className="service-caption service-caption-intent"><span aria-hidden="true">✦</span> О РАБОТЕ И ОБУЧЕНИИ СО МНОЙ.</p>
+        <p className="service-caption"><span aria-hidden="true">✦</span> ОТЗЫВЫ КЛИЕНТОВ И УЧЕНИКОВ.</p>
         <a className="underlined-link service-cta" href="#contact">ОБСУДИТЬ ПРОЕКТ <span aria-hidden="true">→</span></a>
         <div aria-hidden="true" className="service-exit-stripes">
           {Array.from({ length: 5 }, (_, index) => <div className="service-exit-stripe" key={index} />)}

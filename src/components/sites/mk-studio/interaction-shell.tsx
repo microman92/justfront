@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { SplitHoverText } from "./split-hover-text";
 
 type InteractionState = {
   openContact: () => void;
@@ -32,10 +33,9 @@ export function ContactTrigger({
 }
 
 export function SiteInteractionShell({ children }: { children: React.ReactNode }) {
+  const headerRef = useRef<HTMLElement>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
-  const soundRef = useRef<{ context: AudioContext; filter: BiquadFilterNode; gain: GainNode; tones: OscillatorNode[] } | null>(null);
   const openContact = useCallback(() => {
     setMenuOpen(false);
     setContactOpen(true);
@@ -43,48 +43,44 @@ export function SiteInteractionShell({ children }: { children: React.ReactNode }
   const openMenu = useCallback(() => setMenuOpen((current) => !current), []);
 
   useEffect(() => {
+    let disposed = false;
+    let revert = () => {};
+
+    const setup = async () => {
+      const { default: gsap } = await import("gsap");
+      await document.fonts.ready;
+      const header = headerRef.current;
+      if (!header || disposed) return;
+
+      const media = gsap.matchMedia();
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        const context = gsap.context(() => {
+          const brand = header.querySelector(".brand-link");
+          const actions = header.querySelector(".header-actions");
+          if (!brand || !actions) return;
+
+          gsap.from([brand, actions], {
+            autoAlpha: 0,
+            y: -16,
+            duration: 0.78,
+            ease: "power3.out",
+            stagger: 0.12,
+            clearProps: "transform,opacity,visibility",
+          });
+        }, header);
+
+        return () => context.revert();
+      });
+      revert = () => media.revert();
+      if (disposed) revert();
+    };
+
+    void setup();
     return () => {
-      const sound = soundRef.current;
-      if (!sound) return;
-      sound.tones.forEach((tone) => tone.stop());
-      void sound.context.close();
-      soundRef.current = null;
+      disposed = true;
+      revert();
     };
   }, []);
-
-  const toggleSound = async () => {
-    if (!soundRef.current) {
-      const context = new AudioContext();
-      const filter = context.createBiquadFilter();
-      const gain = context.createGain();
-      filter.type = "lowpass";
-      filter.frequency.value = 180;
-      gain.gain.value = 0;
-      filter.connect(gain).connect(context.destination);
-      const tones = [55, 82.4].map((frequency) => {
-        const tone = context.createOscillator();
-        tone.type = "sine";
-        tone.frequency.value = frequency;
-        tone.connect(filter);
-        tone.start();
-        return tone;
-      });
-      soundRef.current = { context, filter, gain, tones };
-    }
-    const sound = soundRef.current;
-    if (soundOn) {
-      sound.gain.gain.setTargetAtTime(0, sound.context.currentTime, 0.18);
-      setSoundOn(false);
-      return;
-    }
-    try {
-      await sound.context.resume();
-      sound.gain.gain.setTargetAtTime(0.012, sound.context.currentTime, 0.3);
-      setSoundOn(true);
-    } catch {
-      setSoundOn(false);
-    }
-  };
 
   useEffect(() => {
     if (!contactOpen && !menuOpen) return;
@@ -122,21 +118,12 @@ export function SiteInteractionShell({ children }: { children: React.ReactNode }
   return (
     <InteractionContext.Provider value={{ openContact, openMenu }}>
       <a className="skip-link" href="#main-content">К основному содержимому</a>
-      <header className="site-header">
+      <header className="site-header" ref={headerRef}>
         <a aria-label="На главную JustFront" className="brand-link" href="#top">
-          <Image alt="" height={763} src="/sites/mk-studio/brand/justfront-mark.svg" width={788} /><span className="brand-name">JustFront</span>
+          <Image alt="" height={763} src="/sites/mk-studio/brand/justfront-mark.svg" width={788} /><span className="brand-name"><SplitHoverText>JustFront</SplitHoverText></span>
         </a>
         <div className="header-actions">
-          <button
-              aria-label={soundOn ? "Выключить звук" : "Включить звук"}
-            aria-pressed={soundOn}
-            className="sound-toggle"
-            onClick={() => void toggleSound()}
-            type="button"
-          >
-            <span aria-hidden="true">{soundOn ? "◖" : "◗"}</span>
-          </button>
-          <button className="talk-pill" onClick={openContact} type="button">ОБСУДИТЬ ПРОЕКТ</button>
+          <button className="talk-pill" onClick={openContact} type="button"><SplitHoverText>ОБСУДИТЬ ПРОЕКТ</SplitHoverText></button>
           <button
             aria-expanded={menuOpen}
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
@@ -144,7 +131,7 @@ export function SiteInteractionShell({ children }: { children: React.ReactNode }
             onClick={openMenu}
             type="button"
           >
-            {menuOpen ? "ЗАКРЫТЬ" : "МЕНЮ"}<span aria-hidden="true">{menuOpen ? " ×" : " ㆔"}</span>
+            <SplitHoverText key={menuOpen ? "close" : "menu"}>{menuOpen ? "ЗАКРЫТЬ" : "МЕНЮ"}</SplitHoverText><span aria-hidden="true">{menuOpen ? " ×" : " ㆔"}</span>
           </button>
         </div>
       </header>
@@ -156,13 +143,14 @@ export function SiteInteractionShell({ children }: { children: React.ReactNode }
           <nav aria-label="Основная навигация" className="menu-panel">
             <button aria-label="Закрыть меню" className="contact-close menu-close" onClick={closeAll} type="button">×</button>
             <p className="eyebrow">JUSTFRONT · FRONTEND И AI</p>
-            <a href="#services" onClick={closeAll}>Услуги <span>01</span></a>
-            <a href="#work" onClick={closeAll}>Проекты <span>02</span></a>
-            <a href="#about" onClick={closeAll}>Обо мне <span>03</span></a>
-            <button onClick={openContact} type="button">Связаться <span>04</span></button>
+            <a href="#services" onClick={closeAll}><SplitHoverText>Услуги</SplitHoverText><span className="menu-index">01</span></a>
+            <a href="#work" onClick={closeAll}><SplitHoverText>Проекты</SplitHoverText><span className="menu-index">02</span></a>
+            <a href="#about" onClick={closeAll}><SplitHoverText>Обо мне</SplitHoverText><span className="menu-index">03</span></a>
+            <a href="#reviews" onClick={closeAll}><SplitHoverText>Отзывы</SplitHoverText><span className="menu-index">04</span></a>
+            <button onClick={openContact} type="button"><SplitHoverText>Связаться</SplitHoverText><span className="menu-index">05</span></button>
             <div className="menu-footer">
               <p>Разработка сайтов.<br />Веб-приложения.<br />AI-интеграции.</p>
-              <a href="https://t.me/justfront" rel="noopener noreferrer" target="_blank">TELEGRAM<br />@justfront</a>
+              <a href="https://t.me/justfront" rel="noopener noreferrer" target="_blank"><SplitHoverText>TELEGRAM<br />@justfront</SplitHoverText></a>
             </div>
           </nav>
         </div>

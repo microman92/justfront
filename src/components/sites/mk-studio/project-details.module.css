@@ -1,0 +1,41 @@
+.section { position:relative; z-index:2; padding:95px max(24px,6vw) 90px; background:#090f11; color:#dfe9e7; scroll-margin-top:70px; }
+.heading { display:flex; justify-content:space-between; gap:35px; max-width:1500px; margin:0 auto 65px; align-items:end; }
+.heading p { margin:0 0 22px; color:#8fc3ba; font:10px/1.5 var(--mono); letter-spacing:.08em; }
+.heading h2 { margin:0; font:400 clamp(42px,4.5vw,74px)/.98 var(--display); letter-spacing:-.05em; }
+.heading>span { max-width:26ch; color:#a9bfba; font-size:14px; line-height:1.5; }
+.stage { position:relative; display:grid; gap:55px; max-width:1500px; margin:0 auto; perspective:2400px; }
+.project { position:relative; display:grid; grid-template-columns:1.15fr 1fr; min-width:0; background:#0d181b; border:1px solid #83b5ad38; backface-visibility:hidden; }
+.preview { position:relative; display:block; min-width:0; overflow:hidden; min-height:360px; background:#122022; }
+.preview::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 65%,rgba(5,12,13,.5)); pointer-events:none; }
+.preview img { display:block; width:100%; height:100%; object-fit:cover; object-position:top left; }
+.previewIndex { position:absolute; z-index:1; left:20px; right:20px; bottom:20px; display:flex; justify-content:space-between; color:#d4eae5; font:10px var(--mono); }
+.description { display:flex; flex-direction:column; min-width:0; padding:30px clamp(24px,3vw,45px); }
+.projectHead { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; }
+.projectHead p { margin:0 0 10px; color:#99c5bd; font:10px/1.4 var(--mono); text-transform:uppercase; }
+.projectHead h3 { margin:0; font:400 clamp(30px,3.5vw,58px)/1 var(--display); letter-spacing:-.05em; }
+.number { color:#749b9438; font:400 clamp(60px,6vw,100px)/.85 var(--display); letter-spacing:-.08em; }
+.story { display:grid; gap:14px; margin:0 0 24px; }
+.story>div { display:grid; grid-template-columns:70px 1fr; gap:16px; padding-top:12px; border-top:1px solid #80aaa629; }
+.story dt { margin:2px 0 0; color:#91c3b9; font:9px var(--mono); letter-spacing:.06em; }
+.story dd { margin:0; color:#c1cfcb; font-size:clamp(13px,1vw,15px); line-height:1.45; }
+.link { display:flex; justify-content:space-between; gap:22px; width:fit-content; min-width:170px; margin-top:auto; padding:0 0 9px; color:#d9e5e1; border-bottom:1px solid #9cbeb8; font:10px var(--mono); text-decoration:none; }
+.link:hover { color:#9ed4c8; }
+.preview:focus-visible,.link:focus-visible { outline:2px solid #a9e3d7; outline-offset:4px; }
+.footer { display:none; }
+.animated { height:calc(100svh + var(--project-travel, 0px)); overflow:clip; padding:0; }
+.animated .sticky { position:sticky; top:0; height:100svh; min-height:650px; display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:25px; overflow:clip; padding-top:85px; padding-bottom:35px; }
+.animated .heading { width:100%; margin-bottom:0; }
+.animated .stage { width:100%; height:clamp(360px,49svh,530px); max-height:100%; min-height:0; align-self:center; display:block; }
+.animated .project { position:absolute; inset:0; height:100%; min-height:0; grid-template-rows:minmax(0,1fr); overflow:hidden; }
+.animated .preview { min-height:0; }
+.animated .preview img { position:absolute; inset:0; }
+.animated .description { min-height:0; overflow:hidden; }
+.animated .footer { display:flex; justify-content:space-between; gap:20px; width:100%; max-width:1500px; margin:0 auto; color:#86aaa2; font:10px/1.4 var(--mono); }
+.down { margin-left:25px; color:#dfe9e7; }
+/* Bring the next scene over the settled grid instead of scrolling past a full pinned screen. */
+@media(min-width:768px) and (prefers-reduced-motion:no-preference) {
+  :global(#work:has(.design-motion.is-animated)) > .section { margin-top:-150svh; z-index:5; }
+}
+@media(max-width:1100px) { .description { padding:24px; }.story { gap:10px; }.story>div { grid-template-columns:58px 1fr; gap:9px; padding-top:9px; }.number { font-size:65px; }.projectHead { margin-bottom:17px; } }
+@media(max-height:760px) and (min-width:768px) { .animated .sticky { padding-top:75px; gap:20px; }.animated .heading h2 { font-size:42px; }.animated .heading p { margin-bottom:12px; }.animated .stage { height:390px; }.animated .description { padding:22px; }.animated .story { gap:9px; margin-bottom:17px; }.animated .story dd { font-size:12px; } }
+@media(max-width:767px) { .section { padding:70px 22px; }.heading { align-items:start; flex-direction:column; gap:22px; margin-bottom:35px; }.heading>span { max-width:32ch; }.stage { gap:35px; }.project { grid-template-columns:1fr; }.preview { min-height:0; aspect-ratio:16/10; }.description { padding:25px 20px; }.story dd { font-size:14px; }.number { font-size:70px; }.projectHead h3 { font-size:36px; } }

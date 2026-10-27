@@ -3,62 +3,46 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import type { Project } from "./content";
 
 export type GalleryState = { progress: number; invalidate: (() => void) | null };
-const palette = ["#172124", "#334e50", "#a8b9b7", "#5e7275", "#c4cfcd", "#263336"];
-
-function makeStudyTexture(index: number) {
+function makeProjectTexture(project: Project, index: number, invalidate: () => void) {
   const canvas = document.createElement("canvas");
-  canvas.width = 568;
-  canvas.height = 812;
+  canvas.width = 812;
+  canvas.height = 568;
   const context = canvas.getContext("2d")!;
-  const background = context.createLinearGradient(0, 0, 568, 812);
-  background.addColorStop(0, palette[index % palette.length]);
-  background.addColorStop(1, index % 2 ? "#0c1113" : "#222c2f");
-  context.fillStyle = background;
-  context.fillRect(0, 0, 568, 812);
-  context.strokeStyle = "rgba(220,238,235,.12)";
-  context.lineWidth = 1;
-  for (let x = 32; x < 568; x += 48) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, 812);
-    context.stroke();
-  }
-  for (let y = 28; y < 812; y += 48) {
-    context.beginPath();
-    context.moveTo(0, y);
-    context.lineTo(568, y);
-    context.stroke();
-  }
-  context.save();
-  context.translate(284, 376);
-  context.rotate((index - 4) * 0.08);
-  context.strokeStyle = "rgba(180,220,215,.78)";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.arc(0, 0, 112 + index % 3 * 18, -0.8 + index * 0.12, 4.1 + index * 0.08);
-  context.stroke();
-  context.strokeStyle = "rgba(220,238,235,.48)";
-  context.beginPath();
-  context.arc(0, 0, 72 + index % 2 * 12, 0.3, Math.PI * 1.65);
-  context.stroke();
-  context.fillStyle = "rgba(14,22,24,.7)";
-  context.fillRect(-88, -56, 176, 112);
-  context.strokeStyle = "rgba(195,220,216,.82)";
-  context.strokeRect(-88, -56, 176, 112);
-  context.fillStyle = "#d6e3e0";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.font = "500 44px Arial, sans-serif";
-  context.fillText("JF", 0, 1);
-  context.restore();
-  context.fillStyle = "rgba(225,239,236,.8)";
-  context.font = "12px Consolas, monospace";
-  context.fillText("JUSTFRONT / MOTION 0" + (index + 1), 28, 44);
-  context.fillStyle = "rgba(225,239,236,.52)";
-  context.fillText("ФОРМА / СВЕТ / ДВИЖЕНИЕ", 28, 774);
-  return new THREE.CanvasTexture(canvas);
+  const texture = new THREE.CanvasTexture(canvas);
+  const draw = (image?: HTMLImageElement) => {
+    context.fillStyle = "#0c1719";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (image) {
+      const targetHeight = 455;
+      const sourceRatio = image.width / image.height;
+      const targetRatio = canvas.width / targetHeight;
+      const sourceWidth = sourceRatio > targetRatio ? image.height * targetRatio : image.width;
+      const sourceHeight = sourceRatio > targetRatio ? image.height : image.width / targetRatio;
+      context.drawImage(image, (image.width - sourceWidth) / 2, 0, sourceWidth, sourceHeight, 0, 0, canvas.width, targetHeight);
+      context.fillStyle = "rgba(5, 14, 16, .2)";
+      context.fillRect(0, 0, canvas.width, targetHeight);
+    }
+    context.fillStyle = "#0c1719";
+    context.fillRect(0, 455, canvas.width, 113);
+    context.textAlign = "left";
+    context.textBaseline = "alphabetic";
+    context.fillStyle = "#a6d4cc";
+    context.font = "15px Arial, sans-serif";
+    context.fillText(`0${index + 1} / ${project.category.toUpperCase()}`, 26, 485);
+    context.fillStyle = "#e1ece9";
+    context.font = "500 38px Arial, sans-serif";
+    context.fillText(project.name, 26, 537);
+    texture.needsUpdate = true;
+  };
+  draw();
+  const image = new Image();
+  image.onload = () => { draw(image); invalidate(); };
+  image.src = project.preview;
+  texture.userData.cancelLoad = () => { image.onload = null; };
+  return texture;
 }
 const slope = 28 / (Math.PI * 4);
 const pathScale = Math.sqrt(144 + slope * slope);
@@ -82,10 +66,10 @@ function writeVertex(array: Float32Array, index: number, angle: number, offset: 
   array[index + 2] = 12 * sin + nz / length * offset;
 }
 
-export function GalleryRibbon({ state }: { state: React.RefObject<GalleryState> }) {
+export function GalleryRibbon({ state, projects }: { state: React.RefObject<GalleryState>; projects: Project[] }) {
   const group = useRef<THREE.Group>(null);
-  const textures = useMemo(() => Array.from({ length: 9 }, (_, index) => makeStudyTexture(index)), []);
   const { size, invalidate, camera } = useThree();
+  const textures = useMemo(() => projects.map((project, index) => makeProjectTexture(project, index, invalidate)), [projects, invalidate]);
   const compact = size.width < 768;
   const tablet = size.width >= 768 && size.width < 1200;
   const distance = compact ? 28 : tablet ? 24 : 22;
@@ -118,7 +102,7 @@ export function GalleryRibbon({ state }: { state: React.RefObject<GalleryState> 
     return () => {
       [...resources.ribbon, ...resources.grid, ...resources.guides].forEach(geometry => geometry.dispose());
       resources.guideMaterial.dispose();
-      textures.forEach(texture => texture.dispose());
+      textures.forEach(texture => { texture.userData.cancelLoad(); texture.dispose(); });
     };
   }, [invalidate, resources, textures]);
 
@@ -187,15 +171,14 @@ export function GalleryRibbon({ state }: { state: React.RefObject<GalleryState> 
     for (let index = 0; index < 2; index++) resources.guides[index].setDrawRange(0, Math.round(ribbonProgress * 601));
     if (movingHover) invalidate();
   });
-  const gridTextures = [0, 1, 4, 2, 7, 6];
   return <group ref={group}>
     {resources.ribbon.map((geometry, index) => <mesh key={`ribbon-${index}`} geometry={geometry} frustumCulled={false} onPointerOver={(event) => { event.object.userData.hover = true; invalidate(); }} onPointerOut={(event) => { event.object.userData.hover = false; invalidate(); }}>
-      <shaderMaterial uniforms={{ map: { value: textures[8 - index] } }} side={THREE.DoubleSide} toneMapped={false}
+      <shaderMaterial uniforms={{ map: { value: textures[(8 - index) % textures.length] } }} side={THREE.DoubleSide} toneMapped={false}
         vertexShader="varying vec2 ribbonUv; void main(){ ribbonUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }"
         fragmentShader={"uniform sampler2D map; varying vec2 ribbonUv; void main(){ vec2 uv=ribbonUv; if(gl_FrontFacing) uv.x=1.0-uv.x; gl_FragColor=texture2D(map,uv);\n#include <colorspace_fragment>\n}"} />
     </mesh>)}
-    {resources.grid.map((geometry, index) => <mesh key={`grid-${index}`} geometry={geometry} frustumCulled={false}>
-      <meshBasicMaterial map={textures[gridTextures[index]]} side={THREE.DoubleSide} toneMapped={false} />
+    {resources.grid.map((geometry, index) => <mesh key={`grid-${index}`} geometry={geometry} frustumCulled={false} visible={false}>
+      <meshBasicMaterial map={textures[index]} side={THREE.DoubleSide} toneMapped={false} />
     </mesh>)}
     {resources.guideLines.map((line, index) => <primitive key={index} object={line} />)}
   </group>;

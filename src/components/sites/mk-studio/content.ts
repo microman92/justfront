@@ -6,6 +6,7 @@ export type Project = {
   outcome: string;
   focus: string;
   href: string;
+  preview: string;
 };
 
 export const projects: Project[] = [
@@ -17,6 +18,7 @@ export const projects: Project[] = [
     outcome: "На сайте можно изучить ассортимент и рассчитать экономию на энергии.",
     focus: "Каталог · калькулятор",
     href: "https://www.rokacell.com/ru",
+    preview: "/sites/mk-studio/projects/rokacell.webp",
   },
   {
     name: "KIMYO",
@@ -26,6 +28,7 @@ export const projects: Project[] = [
     outcome: "Путь от выбора отрасли до обращения собран на одном сайте.",
     focus: "Каталог · поставки",
     href: "https://kimyo.uz/ru",
+    preview: "/sites/mk-studio/projects/kimyo.webp",
   },
   {
     name: "GrandClean",
@@ -35,6 +38,7 @@ export const projects: Project[] = [
     outcome: "Опубликованный сайт связывает описание услуг с обращением.",
     focus: "Формы · SEO",
     href: "https://grandclean.uz/ru/",
+    preview: "/sites/mk-studio/projects/grandclean.webp",
   },
   {
     name: "Sport Center",
@@ -44,6 +48,7 @@ export const projects: Project[] = [
     outcome: "Опубликованная адаптивная версия с анимированными разделами.",
     focus: "GSAP · адаптивность",
     href: "https://microman92.github.io/sport-center/",
+    preview: "/sites/mk-studio/projects/sport-center.webp",
   },
   {
     name: "IXORA",
@@ -53,15 +58,17 @@ export const projects: Project[] = [
     outcome: "Услуги и географические точки доступны в одном интерфейсе.",
     focus: "Nuxt 3 · карты",
     href: "https://microman92.github.io/ixora/",
+    preview: "/sites/mk-studio/projects/ixora.webp",
   },
   {
     name: "BRUT AI",
-    category: "Эксперимент · AI",
-    task: "Проверить визуальное направление AI-сервиса через веб-интерфейс.",
-    solution: "Экспериментальный интерфейс в AI-направлении.",
-    outcome: "Опубликована интерактивная версия концепции.",
-    focus: "AI · веб-интерфейс",
+    category: "Барбершоп · AI-эксперимент",
+    task: "Создать концепцию сайта барбершопа с выразительной подачей услуг.",
+    solution: "Экспериментальный сайт с использованием AI и интерфейсом записи.",
+    outcome: "Опубликована интерактивная версия концепции BRUT.",
+    focus: "AI · эксперимент",
     href: "https://brut-7lyv.vercel.app/",
+    preview: "/sites/mk-studio/projects/brut.webp",
   },
 ];
 

@@ -1,0 +1,10 @@
+.target {
+  display: inline-block;
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+
+:global(.split-hover-char) {
+  display: inline-block;
+  transform-origin: 50% 50% -10px;
+}

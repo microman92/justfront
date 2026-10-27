@@ -214,7 +214,7 @@ export function ServiceSequence() {
     let targetProgress = 0;
     let displayedProgress = 0;
     let lastMotionTime = 0;
-    let trigger: import("gsap/ScrollTrigger").ScrollTrigger | undefined;
+    let tracking = false;
 
     const updateScene = (outerProgress: number) => {
       const progress = Math.min(1, outerProgress * 1.25);
@@ -239,12 +239,12 @@ export function ServiceSequence() {
       section.style.setProperty("--entry-opacity", String(entryOpacity));
       section.style.setProperty("--work-overlay", String(1 - clamp(progress / 0.1)));
       section.style.setProperty("--heading-opacity", String(clamp((progress - 0.16) / 0.05)));
-      const textChannel = Math.round(242 - entryOpacity * 206);
-      section.style.setProperty("--intro-color", "rgb(" + textChannel + " " + textChannel + " " + textChannel + ")");
+      section.style.setProperty("--intro-color", "#dce7e5");
       const cardProgress = clamp((progress - 0.56) / 0.44);
-      const cardPhase = cardProgress * 3;
+      const cardPhase = cardProgress * Math.max(1, mobileCards.length - 1);
       desktopCards.forEach((label, index) => {
-        const phase = clamp((cardProgress * 0.85 - index * 0.2) / 0.45);
+        const travel = 0.45 + Math.max(0, desktopCards.length - 1) * 0.2;
+        const phase = clamp((cardProgress * travel - index * 0.2) / 0.45);
         const width = Math.round(window.innerWidth * (window.innerWidth < 1512 ? 0.42 : 0.32));
         const height = Math.max(300, Math.min(430, Math.round(window.innerHeight * 0.36)));
         const inset = window.innerWidth < 1512 ? 40 : window.innerWidth * 0.1;
@@ -284,9 +284,17 @@ export function ServiceSequence() {
       if (!motionFrame) motionFrame = requestAnimationFrame(advanceMotion);
     };
 
-    const configureMotion = async () => {
-      trigger?.kill();
-      trigger = undefined;
+    const measureProgress = () => {
+      const rect = section.getBoundingClientRect();
+      setProgress(clamp(-rect.top / Math.max(1, rect.height - window.innerHeight)));
+    };
+
+    const configureMotion = () => {
+      if (tracking) {
+        window.removeEventListener("scroll", measureProgress);
+        window.removeEventListener("resize", measureProgress);
+        tracking = false;
+      }
       if (reducedMotion.matches) {
         scrollProgress.current = 0;
         section.style.setProperty("--service-progress", "0.5");
@@ -300,24 +308,18 @@ export function ServiceSequence() {
         return;
       }
       if (intro) intro.style.removeProperty("display");
-      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
-      if (disposed) return;
-      gsap.registerPlugin(ScrollTrigger);
-      trigger = ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: "bottom bottom",
-        onUpdate: ({ progress }) => setProgress(progress),
-        onRefresh: ({ progress }) => setProgress(progress),
-      });
-      updateScene(trigger.progress);
+      window.addEventListener("scroll", measureProgress, { passive: true });
+      window.addEventListener("resize", measureProgress);
+      tracking = true;
+      measureProgress();
     };
 
     void configureMotion();
     reducedMotion.addEventListener("change", configureMotion);
     return () => {
       disposed = true;
-      trigger?.kill();
+      window.removeEventListener("scroll", measureProgress);
+      window.removeEventListener("resize", measureProgress);
       reducedMotion.removeEventListener("change", configureMotion);
       window.cancelAnimationFrame(motionFrame);
     };

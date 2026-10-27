@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ContactTrigger } from "./interaction-shell";
+import { HeroProof } from "./hero-proof";
+import { TeachingDirections } from "./teaching-directions";
 
 const rotatingServices = [
   "сайты",
@@ -36,9 +38,9 @@ export function HeroExperience() {
         <h1 aria-label="Разрабатываю сайты, веб-приложения, Telegram-боты и Mini Apps, CRM-системы, AI-решения, системы автоматизации и решения под ключ. Преподаю Frontend и AI в PROWEB." id="hero-title">
           Разрабатываю<br /><span aria-hidden="true" className="rotating-word" key={activeService}>{rotatingServices[activeService]}</span>
         </h1>
-        <div aria-label="Преподаю Frontend и AI в PROWEB с 2021 года" className="hero-teaching">
+        <div aria-label="Преподаю Frontend, AI-разработку и Старт в IT в PROWEB с 2021 года" className="hero-teaching">
           <span className="hero-teaching-label">ПРЕПОДАВАНИЕ · PROWEB · С 2021</span>
-          <p><span>Frontend</span><i aria-hidden="true">→</i><span>AI</span></p>
+          <TeachingDirections />
         </div>
         <div className="hero-links">
           <ContactTrigger className="text-link">ОБСУДИТЬ ПРОЕКТ <span aria-hidden="true">→</span></ContactTrigger>
@@ -46,10 +48,7 @@ export function HeroExperience() {
         </div>
       </div>
       <div className="hero-bottom">
-        <div aria-label="Frontend-разработчик и преподаватель PROWEB" className="hero-proof">
-          <span><b>300+</b> учеников</span>
-          <span>Frontend<br />и AI · PROWEB</span>
-        </div>
+        <HeroProof />
         <p className="hero-summary">Frontend-разработчик из Ташкента. React, Next.js, Vue и Nuxt.</p>
       </div>
       <p aria-hidden="true" className="hero-instruction">ЗАЖМИТЕ, ЧТОБЫ РАЗЛЕТЕЛСЯ ЛОГОТИП</p>
