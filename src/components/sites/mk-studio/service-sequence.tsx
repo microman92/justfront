@@ -240,12 +240,14 @@ export function ServiceSequence() {
       section.style.setProperty("--work-overlay", String(1 - clamp(progress / 0.1)));
       section.style.setProperty("--heading-opacity", String(clamp((progress - 0.16) / 0.05)));
       section.style.setProperty("--intro-color", "#dce7e5");
-      const cardProgress = clamp((progress - 0.56) / 0.44);
+      const cardProgress = clamp((progress - 0.48) / 0.52);
       const cardPhase = cardProgress * Math.max(1, mobileCards.length - 1);
+      const desktopWidth = desktopCards[0]?.offsetWidth || 0;
+      const desktopHeight = desktopCards[0]?.offsetHeight || 0;
       desktopCards.forEach((label, index) => {
         const phase = clamp(cardProgress * desktopCards.length - index);
-        const width = Math.round(window.innerWidth * (window.innerWidth < 1512 ? 0.42 : 0.32));
-        const height = Math.max(300, Math.min(430, Math.round(window.innerHeight * 0.36)));
+        const width = desktopWidth;
+        const height = desktopHeight;
         const inset = window.innerWidth < 1512 ? 40 : window.innerWidth * 0.1;
         const bend = phase <= 0.5 ? Math.sin(phase * Math.PI) : 1;
         const left = index % 2 === 0;
@@ -261,10 +263,11 @@ export function ServiceSequence() {
       });
       mobileCards.forEach((label, index) => {
         const distance = Math.abs(index - cardPhase);
+        const opacity = clamp(1 - distance * 1.15) * clamp((progress - 0.48) * 15);
         label.style.setProperty("--service-offset", String(index - cardPhase));
-        label.style.setProperty("--service-opacity", String(clamp(1 - Math.abs(index - cardPhase) * 1.15) * clamp((progress - 0.56) * 15)));
-        label.classList.toggle("is-active", distance < 0.5 && progress > 0.56);
-        label.inert = distance >= 0.5 || progress <= 0.56;
+        label.style.setProperty("--service-opacity", String(opacity));
+        label.classList.toggle("is-active", opacity > 0.5);
+        label.inert = opacity <= 0.5;
       });
       section.style.setProperty("--service-progress", String(progress));
     };

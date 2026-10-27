@@ -8,12 +8,7 @@ export function ReviewCard({ review, index, onOpen }: { review: ReviewSlot; inde
     <button className={styles.openCard} type="button" onClick={() => onOpen(review)} aria-label={`Открыть отзыв: ${review.author}`} />
     <div className={styles.header}><span>{String(index + 1).padStart(2, "0")} / {review.category}</span><span>{review.source}</span></div>
     <div className={styles.proof}>
-      {review.screenshot ? <div className={styles.screenshot}><Image src={review.screenshot} alt="" fill sizes="(max-width: 767px) 32vw, 15vw" /><span>ОТКРЫТЬ ОТЗЫВ ↗</span></div> : <><MessageSquareText size={30} strokeWidth={1} aria-hidden="true" /><span>Личная переписка</span><small>TELEGRAM · ОТКРЫТЬ ↗</small></>}
-    </div>
-    <div className={styles.copy}>
-      <h3>{review.title}</h3>
-      <blockquote>«{review.quote}»</blockquote>
-      <div className={styles.author}><span>{review.author}</span></div>
+      {review.screenshot ? <div className={styles.screenshot}><Image src={review.screenshot} alt="" fill sizes="(max-width: 767px) 90vw, 52vw" unoptimized /></div> : <><MessageSquareText size={30} strokeWidth={1} aria-hidden="true" /><span>Личная переписка</span><small>TELEGRAM · ОТКРЫТЬ ↗</small></>}
     </div>
   </>;
 }
