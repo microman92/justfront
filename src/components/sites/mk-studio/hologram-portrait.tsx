@@ -53,7 +53,7 @@ const fragmentShader = `
     float pulse = smoothstep(1.8, 1.84, phase) * (1.0 - smoothstep(2.08, 2.14, phase)) * uMotion;
     float axis = mix(uv.y, uv.x, direction);
     float band = 1.0 - smoothstep(0.0, width, abs(axis - position));
-    float displacement = sin(floor(axis * 160.0) * 7.0 + uTime * 36.0) * band * pulse * 0.012;
+    float displacement = sin(floor(axis * 160.0) * 7.0 + uTime * 36.0) * band * pulse * 0.017;
     uv += mix(vec2(displacement, 0.0), vec2(0.0, displacement), direction);
 
     // Quantize the portrait to the same screen lattice as the RGB subpixel mask.
@@ -81,7 +81,7 @@ const fragmentShader = `
       + portraitAt(uv - vec2(0.0, glowOffset.y)).rgb;
     color += glow * vec3(0.045, 0.075, 0.065);
     color *= 1.0 + 0.018 * sin(uTime * 1.8 + pixel.y * 0.008) * uMotion;
-    color *= 1.0 + band * pulse * 0.15;
+    color *= 1.0 + band * pulse * 0.21;
     float scan = exp(-pow((uv.y - fract(uTime * 0.065)) * 90.0, 2.0)) * 0.035 * uMotion;
     color += vec3(0.45, 0.85, 0.75) * scan;
     float bottomFade = smoothstep(0.0, 0.10, vUv.y);

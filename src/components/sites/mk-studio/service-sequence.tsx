@@ -10,114 +10,66 @@ function clamp(value: number) {
 
 const particleVertexShader = `
   attribute float aSeed;
-  attribute float aInner;
+  attribute float aRadius;
   uniform float uTime;
   uniform float uProgress;
   uniform float uPixelRatio;
-  varying float vLight;
+  varying float vRadius;
+  varying float vSeed;
 
   void main() {
+    float angle = uTime * 0.16 * (1.0 - aRadius) + uProgress * 0.12;
+    float c = cos(angle);
+    float s = sin(angle);
     vec3 p = position;
-    float time = uTime * 0.25;
-    if (aInner > 0.5) {
-      float current = sin(position.y * 14.0 + uTime * 0.7) * 0.5;
-      float flowC = cos(current);
-      float flowS = sin(current);
-      p.xz = mat2(flowC, -flowS, flowS, flowC) * p.xz;
-      p *= 1.0 + 0.035 * sin(position.x * 18.0 + position.y * 13.0 - uTime * 0.8);
-    } else {
-      float drift = uTime * 0.55 + aSeed * 6.283185;
-      p.xy += vec2(sin(drift + position.y * 2.0), cos(drift + position.x * 2.0)) * 0.008;
-      p.z += sin(drift * 0.8) * 0.006;
-    }
-    float twist = sin(p.y * 3.4 + time) * 0.025 + uProgress * 0.06;
-    float c = cos(twist);
-    float s = sin(twist);
-    p.xz = mat2(c, -s, s, c) * p.xz;
-    float wave = sin(p.x * 5.0 + p.y * 3.0 + time * 1.4)
-      * cos(p.z * 4.0 - p.y * 4.0 - time);
-    p *= 1.0 + wave * mix(0.02, 0.01, aInner);
+    p.xy = mat2(c, -s, s, c) * p.xy;
     vec4 viewPosition = modelViewMatrix * vec4(p, 1.0);
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = (1.25 + aSeed * 1.0) * uPixelRatio * (5.9 / -viewPosition.z);
-    float streak = sin(atan(p.z, p.x) * 3.0 + p.y * 4.0 + time * 0.8);
-    vLight = mix(0.62, 0.96, aSeed) * mix(0.42 + 0.58 * smoothstep(-0.5, 0.7, streak), 1.0, aInner);
-    vec3 innerDirection = normalize(position + vec3(0.00001));
-    float longitude = atan(innerDirection.z, innerDirection.x);
-    float streamA = 1.0 - smoothstep(0.03, 0.24, abs(sin(longitude * 2.0 + innerDirection.y * 5.0 + uTime * 0.8)));
-    float streamB = 1.0 - smoothstep(0.03, 0.2, abs(sin(longitude - innerDirection.y * 6.0 - uTime * 0.55)));
-    float rim = smoothstep(0.65, 0.98, length(innerDirection.xy));
-    float innerShimmer = clamp(0.18 + streamA * 0.55 + streamB * 0.35 + rim * 0.25, 0.0, 1.0);
-    vLight *= mix(1.0, innerShimmer, aInner);
+    gl_PointSize = (1.4 + aSeed * 3.0) * uPixelRatio * (5.9 / -viewPosition.z);
+    vRadius = aRadius;
+    vSeed = aSeed;
   }
 `;
 
 const particleFragmentShader = `
-  varying float vLight;
+  varying float vRadius;
+  varying float vSeed;
   void main() {
     float distanceToCenter = length(gl_PointCoord - vec2(0.5));
     if (distanceToCenter > 0.5) discard;
-    float alpha = (1.0 - smoothstep(0.15, 0.5, distanceToCenter)) * vLight;
-    gl_FragColor = vec4(vec3(0.78, 0.93, 0.91), alpha);
+    float glow = pow(max(0.0, 1.0 - distanceToCenter * 2.0), 1.6);
+    vec3 inner = vec3(0.75, 0.96, 0.91);
+    vec3 outer = vec3(0.16, 0.52, 0.55);
+    vec3 color = mix(inner, outer, smoothstep(0.0, 1.0, vRadius));
+    gl_FragColor = vec4(color, glow * mix(0.45, 0.95, vSeed));
     #include <colorspace_fragment>
   }
 `;
 
 function createParticles() {
-  const pointsPerOrbit = 12000;
-  const outerCount = pointsPerOrbit * 3;
-  const innerCount = 7000;
-  const total = outerCount + innerCount;
+  const total = 20000;
   const positions = new Float32Array(total * 3);
   const seeds = new Float32Array(total);
-  const layers = new Float32Array(total);
+  const radii = new Float32Array(total);
   const random = (value: number) => {
     const result = Math.sin(value * 127.1 + 311.7) * 43758.5453;
     return result - Math.floor(result);
   };
   for (let index = 0; index < total; index += 1) {
-    const inner = index >= outerCount;
     const seed = random(index + 1);
-    if (inner) {
-      const innerIndex = index - outerCount;
-      if (innerIndex < 3000) {
-        const stream = Math.floor(innerIndex / 1500);
-        const phase = (innerIndex % 1500 + seed) / 1500 * Math.PI * 2;
-        const tilt = stream === 0 ? 0.65 : -0.85;
-        const x = Math.cos(phase) * 0.225;
-        const y = Math.sin(phase) * 0.13;
-        const jitter = (random(index + 17) - 0.5) * 0.02;
-        positions[index * 3] = x * Math.cos(tilt) - y * Math.sin(tilt) + jitter;
-        positions[index * 3 + 1] = x * Math.sin(tilt) + y * Math.cos(tilt) + jitter;
-        positions[index * 3 + 2] = Math.sin(phase) * 0.19 + jitter;
-      } else {
-        const y = 1 - 2 * random(index + 7);
-        const ring = Math.sqrt(Math.max(0, 1 - y * y));
-        const angle = random(index + 23) * Math.PI * 2;
-        const radiusSeed = random(index + 41);
-        const radius = 0.24 * (seed > 0.38 ? 0.92 + radiusSeed * 0.08 : Math.cbrt(radiusSeed) * 0.9);
-        positions[index * 3] = Math.cos(angle) * ring * radius;
-        positions[index * 3 + 1] = y * radius;
-        positions[index * 3 + 2] = Math.sin(angle) * ring * radius;
-      }
-    } else {
-      const orbit = Math.floor(index / pointsPerOrbit);
-      const phase = ((index % pointsPerOrbit) + seed) / pointsPerOrbit * Math.PI * 2;
-      const angle = (orbit - 1) * Math.PI / 3;
-      const normalX = Math.cos(phase) / 1.48;
-      const normalY = Math.sin(phase) / 0.56;
-      const normalLength = Math.hypot(normalX, normalY);
-      const spread = (random(index + 57) + random(index + 83) - 1) * (seed > 0.86 ? 0.18 : 0.055);
-      const x = Math.cos(phase) * 1.48 + normalX / normalLength * spread;
-      const y = Math.sin(phase) * 0.56 + normalY / normalLength * spread;
-      positions[index * 3] = x * Math.cos(angle) - y * Math.sin(angle);
-      positions[index * 3 + 1] = x * Math.sin(angle) + y * Math.cos(angle);
-      positions[index * 3 + 2] = (random(index + 109) - 0.5) * 0.12 + Math.sin(phase) * 0.08;
-    }
+    const ratio = Math.pow(random(index + 17), 1.5);
+    const radius = ratio * 2.25;
+    const branch = (index % 3) * Math.PI * 2 / 3;
+    const angle = branch + radius * 1.25;
+    const spread = 0.06 + ratio * 0.48;
+    const offset = (n: number) => Math.pow(random(index + n) * 2 - 1, 3) * spread;
+    positions[index * 3] = Math.cos(angle) * radius + offset(37);
+    positions[index * 3 + 1] = Math.sin(angle) * radius + offset(61);
+    positions[index * 3 + 2] = offset(89) * 0.4;
     seeds[index] = seed;
-    layers[index] = inner ? 1 : 0;
+    radii[index] = ratio;
   }
-  return { positions, seeds, layers };
+  return { positions, seeds, radii };
 }
 
 function ParticleBubble({ reducedMotion, scrollProgress, pointer }: {
@@ -146,19 +98,20 @@ function ParticleBubble({ reducedMotion, scrollProgress, pointer }: {
     }
     if (group.current) {
       const damping = 1 - Math.exp(-Math.min(delta, 0.05) * 2.8);
-      const x = reducedMotion ? 0 : pointer.current.y * 0.18;
+      const x = 0.55 + (reducedMotion ? 0 : pointer.current.y * 0.10);
       const y = reducedMotion ? 0 : pointer.current.x * 0.22 + progress * 0.45;
       group.current.rotation.x += (x - group.current.rotation.x) * damping;
       group.current.rotation.y += (y - group.current.rotation.y) * damping;
+      group.current.rotation.z = reducedMotion ? 0 : -elapsed.current * 0.06;
     }
   });
 
-  return <group ref={group} scale={Math.min(1, viewportWidth / 3.35)}>
+  return <group ref={group} scale={Math.min(1, viewportWidth / 4.8)}>
     <points frustumCulled={false}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[particles.positions, 3]} />
         <bufferAttribute attach="attributes-aSeed" args={[particles.seeds, 1]} />
-        <bufferAttribute attach="attributes-aInner" args={[particles.layers, 1]} />
+        <bufferAttribute attach="attributes-aRadius" args={[particles.radii, 1]} />
       </bufferGeometry>
       <shaderMaterial ref={material} uniforms={uniforms} vertexShader={particleVertexShader} fragmentShader={particleFragmentShader} transparent depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
